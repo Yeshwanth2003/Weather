@@ -1,0 +1,187 @@
+<html>
+    <head>
+        <title>MY DAILY WEATHER</title>
+        <link rel = "icon" href = 
+"https://freepngimg.com/thumb/weather/23529-2-weather-hd.png" >
+       <link rel="stylesheet" href="weather.css">
+       <style>
+           #divh{
+    text-align: center;
+   
+    background-color:black;
+}
+#divhp{
+    opacity: 1;
+    font-weight: bolder;
+    font-size: 60px;
+    font-family: fantasy;
+    color: white;
+    padding: 5px;
+    margin: 10px;
+}
+body{
+    text-align: center;
+    background:linear-gradient(lightgreen,white,lightgreen) ;
+}
+input{
+    width: 500px;
+    height: 30px;
+    text-align: center;
+    margin: 5px 0 5px 5px;
+    border: black rounded 5px;
+    border-radius: 20px ;
+    background: linear-gradient(30deg,skyblue,white);
+}
+button{
+    height: 30px;
+    margin: 0;
+    border: black rounded 5px;
+    border-radius: 20px ;
+    background-color: skyblue;
+    font-weight: bolder;
+    color:black;
+}  
+.body1{
+    text-align: center;
+    background:linear-gradient(orange,white,orange) ;
+}
+.body2{
+    text-align: center;
+    background:linear-gradient(grey,white,grey) ;
+}
+img{
+    width: 150px;
+    height:100px;
+}
+#main{
+    font-weight: bolder;
+    font-size: 50px;
+}
+.r{
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-weight: bolder;
+    font-size: 40px;
+}
+.body3{
+    text-align: center;
+    background:linear-gradient(lightgreen,white,lightgreen) ;
+}
+
+       </style>
+    </head>
+    <body>
+        <div id="divh"><p id="divhp">MY DAILY WEATHER</p></div>
+        <div id="search">
+            <input type="text">
+            <button>Search</button>
+            <button id = "loco">location</button>
+        </div>
+        <div id ="content">
+            <p id ="main"></p>
+            <img src="C:\\Users\\L E N O V O\\.vscode\\weatherSrcjpg.jpg">
+            <p id="temp" class="r"></p>
+            <p id ="cl" class="r"></p>
+        </div>
+    </body>
+    <script >
+
+       var UserName =  prompt("your name is?");
+
+button = document.querySelector("button");
+t = document.getElementById("temp");
+cl = document.getElementById("cl");
+img = document.querySelector("img");
+head = document.getElementById("main");
+body = document.querySelector("body");
+loco = document.querySelector('#loco');
+var locat;
+
+button.onclick = () =>{
+    
+    input = document.querySelector("input").value;
+    input1 = input.replace(" ","+");
+    url = "http://api.openweathermap.org/data/2.5/weather?q="+input1+"&APPID=4fe0bea221bc34a53a22568fac10267e";
+    fetch(url).then(r =>r.json()).then(data =>{
+
+       if((data.weather[0].main =="Clouds")||(data.weather[0].main =="Mist")||(data.weather[0].main =="Rain")){
+           body.classList.add("body2")
+       }
+       else if(data.weather[0].main =="Clear"){
+        body.classList.add("body1")
+    }
+    else{
+        body.classList.add("body3")
+    }
+
+        cel = Math.round((data.main.temp) - 273.15);
+        t.innerHTML = cel+" deg Celcius";
+        cl.innerHTML = "Situation :"+ data.weather[0].description;
+        pic="https://openweathermap.org/img/w/"+data.weather[0].icon+".png";
+        img.src = pic;
+        head.innerHTML = (data.weather[0].main).toUpperCase();
+    }).catch(err => alert("Error "+err))
+
+    fetch("/", {
+     method: "POST",
+     body: JSON.stringify({
+         name:UserName
+     }),
+     headers: {
+         "Content-type": "application/json; charset=UTF-8"
+     }
+ });
+
+}
+
+loco.onclick = () =>
+  {
+  navigator.geolocation.getCurrentPosition(show)
+  
+ function show(position){
+  var lat,lon;
+  lat = position.coords.latitude 
+  lon = position.coords.longitude
+  //alert(lat +" " + lon)
+  callback(lat,lon)
+ }
+ 
+}
+
+function callback(lat,lon){
+  var urlloco = "https://api.opencagedata.com/geocode/v1/json?key=53654ffd293d4fe59cf1951df1395070&q="+lat+"%2C+"+lon+"&pretty=1&no_annotations=1";
+
+  fetch(urlloco).then(r=>r.json()).then(data => {
+      
+   locat = data.results[0].components.suburb
+    alert(locat)
+
+
+   var navi = locat.replace(" ","+")
+    
+    url1 = "http://api.openweathermap.org/data/2.5/weather?q="+navi+"&APPID=4fe0bea221bc34a53a22568fac10267e";
+    fetch(url1).then(r =>r.json()).then(data =>{
+
+       if((data.weather[0].main =="Clouds")||(data.weather[0].main =="Mist")||(data.weather[0].main =="Rain")){
+           body.classList.add("body2")
+       }
+       else if(data.weather[0].main =="Clear"){
+        body.classList.add("body1")
+    }
+    else{
+        body.classList.add("body3")
+    }
+
+        cel = Math.round((data.main.temp) - 273.15);
+        t.innerHTML = cel+" deg Celcius";
+        cl.innerHTML = "Situation :"+ data.weather[0].description;
+        pic="https://openweathermap.org/img/w/"+data.weather[0].icon+".png";
+        img.src = pic;
+        head.innerHTML = (data.weather[0].main).toUpperCase();
+    }).catch(err => alert("Error "+err))
+  
+
+}
+).catch(err => alert("Error "+err))
+}
+    </script>
+</html>
